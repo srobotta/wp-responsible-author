@@ -19,8 +19,6 @@ delete_option('responsible_author_post_types');
 $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE `meta_key` = 'responsible_author'");
 
 // Remove this directory.
-echo (__DIR__);
-
 function responsible_author_rrmdir($dir) {
    if (is_dir($dir)) {
        $objects = scandir($dir);
