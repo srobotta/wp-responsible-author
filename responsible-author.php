@@ -33,17 +33,29 @@ add_action('admin_menu', 'responsible_author_add_settings_page');
     
 // Render settings page
 function responsible_author_render_settings_page() {
-    if (isset($_POST['responsible_author_post_types']) && check_admin_referer('responsible_author_settings_save')) {
+    if (isset($_POST['responsible_author_post_types']) &&
+        isset($_POST['responsible_author_more_than_one']) &&
+        check_admin_referer('responsible_author_settings_save')
+    ) {
         $types = array_filter(array_map('trim', explode(',', $_POST['responsible_author_post_types'])));
         update_option('responsible_author_post_types', $types);
+        update_option('responsible_author_more_than_one', $_POST['responsible_author_more_than_one'] === '1' ? 1 : 0);
         echo '<div class="updated"><p>' . __('Settings saved') . '</p></div>';
     }
     $types = get_option('responsible_author_post_types', []);
+    $more_than_one = (int)get_option('responsible_author_more_than_one', 0);
     ?>
     <div class="wrap">
         <h1><?php esc_html_e('Responsible Author Settings', 'responsible-author'); ?></h1>
         <form method="post">
             <?php wp_nonce_field('responsible_author_settings_save'); ?>
+            <p>
+                <?php esc_html_e('More than one person can be responsible author', 'responsible-author'); ?>
+                <select name="responsible_author_more_than_one">
+                    <option value="0" <?php selected(0, $more_than_one); ?>><?php esc_html_e('No'); ?></option>
+                    <option value="1" <?php selected(1, $more_than_one); ?>><?php esc_html_e('Yes'); ?></option>
+                </select>
+            </p>
             <p><?php esc_html_e('Enter a comma-separated list of post types where the Responsible Author dropdown should appear:', 'responsible-author'); ?></p>
             <input type="text" name="responsible_author_post_types" value="<?php echo esc_attr(implode(',', $types)); ?>" style="width:400px;" />
             <p><input type="submit" class="button-primary" value="<?php echo esc_attr(__('Save Changes')); ?>" /></p>
@@ -86,16 +98,18 @@ add_action('add_meta_boxes', 'responsible_author_add_metabox');
 // Meta box content
 function responsible_author_metabox_callback($post) {
     // Retrieve current value
-    $selected_user = get_post_meta($post->ID, 'responsible_author', true);
+    $selected_users = explode(',', get_post_meta($post->ID, 'responsible_author', true));
 
     // Get all users
     $users = get_users(['fields' => ['ID', 'display_name']]);
+    $more_than_one = get_option('responsible_author_more_than_one', 0)
+        ? '[]" multiple="multiple"' : '"';
 
-    echo '<select name="responsible_author" id="responsible_author" style="width:100%">';
-    echo '<option value="">-- Select User --</option>';
+    echo '<select name="responsible_author' . $more_than_one . ' id="responsible_author" style="width:100%">';
+    echo '<option value="">-- ' . esc_html('Select User', 'responsible-author') . ' --</option>';
     foreach ($users as $user) {
-        $selected = selected($selected_user, $user->ID, false);
-        echo '<option value="' . esc_attr($user->ID) . '" ' . $selected . '>' . esc_html($user->display_name) . '</option>';
+        $selected = in_array($user->ID, $selected_users) ? ' selected="selected"' : '';
+        echo '<option value="' . esc_attr($user->ID) . '"' . $selected . '>' . esc_html($user->display_name) . '</option>';
     }
     echo '</select>';
 
@@ -122,7 +136,11 @@ function responsible_author_save_metabox($post_id) {
 
     // Save or delete meta
     if (isset($_POST['responsible_author']) && !empty($_POST['responsible_author'])) {
-        update_post_meta($post_id, 'responsible_author', sanitize_text_field($_POST['responsible_author']));
+        $value = is_array($_POST['responsible_author'])
+            ? implode(',', array_map('intval', $_POST['responsible_author']))
+            : sanitize_text_field($_POST['responsible_author']);
+        $value = ',' . $value . ',';
+        update_post_meta($post_id, 'responsible_author', $value);
     } else {
         delete_post_meta($post_id, 'responsible_author');
     }
@@ -130,22 +148,33 @@ function responsible_author_save_metabox($post_id) {
 add_action('save_post', 'responsible_author_save_metabox');
 
 // Add custom section to user profile page
-function responsible_posts_profile_section( $user ) {
+function responsible_posts_profile_section($user) {
     // In which post types can we expect the field?
     $types = get_option('responsible_author_post_types', []);
     if (empty($types)) {
         return;
     }
+    $more_than_one = (int)get_option('responsible_author_more_than_one', 0);
     // Query posts where the user is set as responsible_author
-    $args = array(
+    $args = [
         'post_type'      => $types,
         'posts_per_page' => -1,
-        'meta_key'       => 'responsible_author',
-        'meta_value'     => $user->ID,
         'post_status'    => 'any',
-    );
+    ];
+    if ($more_than_one) {
+        $args['meta_query'] = [
+            [
+                'key'   => 'responsible_author',
+                'value' => ',' . $user->ID . ',',
+                'compare' => 'LIKE',
+            ],
+        ];
+    } else {
+        $args['meta_key'] = 'responsible_author';
+        $args['meta_value'] = ',' . $user->ID . ',';
+    }
 
-    $responsible_posts = get_posts( $args );
+    $responsible_posts = get_posts($args);
     ?>
     <h2><?php esc_html_e('Posts where you are set Responsible Author', 'responsible-author'); ?></h2>
     <table class="form-table">

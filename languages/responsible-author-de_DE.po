@@ -5,8 +5,8 @@ msgstr ""
 "Project-Id-Version: Responsible Author 1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/responsible-"
 "author\n"
-"POT-Creation-Date: 2025-09-18T14:17:06+00:00\n"
-"PO-Revision-Date: 2025-09-18 16:35+0200\n"
+"POT-Creation-Date: 2025-09-19 20:43+0200\n"
+"PO-Revision-Date: 2025-09-19 20:54+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de\n"
@@ -16,35 +16,19 @@ msgstr ""
 "X-Generator: Poedit 3.7\n"
 "X-Domain: responsible-author\n"
 
-#. Plugin Name of the plugin
-#: responsible-author.php responsible-author.php:26
-msgid "Responsible Author"
-msgstr "Verantwortlicher Autor"
-
-#. Plugin URI of the plugin
-#: responsible-author.php
-msgid "https://github.com/srobotta/wp-responsible-author"
-msgstr ""
-
-#. Description of the plugin
-#: responsible-author.php
-msgid ""
-"Adds a dropdown in post editor to select a responsible user and saves it in "
-"the 'responsible_author' custom field."
-msgstr ""
-"Fügt im Post Bearbeiten Dialog eine Dialogbox hinzu, wo der verantwortliche "
-"Autor für diesen Post definiert werden kann."
-
-#. Author of the plugin
-#: responsible-author.php
-msgid "Stephan Robotta <stephan.robotta@bfh.ch>"
-msgstr ""
-
-#: responsible-author.php:25
+#: responsible-author.php:25 responsible-author.php:49
 msgid "Responsible Author Settings"
 msgstr "Verantwortlicher Autor Einstellungen"
 
-#: responsible-author.php:47
+#: responsible-author.php:26
+msgid "Responsible Author"
+msgstr "Verantwortlicher Autor"
+
+#: responsible-author.php:53
+msgid "More than one person can be responsible author"
+msgstr "Mehr als eine Person kann verantwortlicher Autor sein"
+
+#: responsible-author.php:59
 msgid ""
 "Enter a comma-separated list of post types where the Responsible Author "
 "dropdown should appear:"
@@ -52,14 +36,25 @@ msgstr ""
 "Gebe eine kommagetrennte Liste von Posttypen ein, wo das Feld "
 "\"Verantwortlicher Autor\" erscheinen soll:"
 
-#: responsible-author.php:50
+#: responsible-author.php:62
 msgid "Possible post types are:"
 msgstr "Mögliche Post Typen sind:"
 
-#: responsible-author.php:150
+#: responsible-author.php:109
+msgid "Select User"
+msgstr "Wähle Benutzer"
+
+#: responsible-author.php:179
 msgid "Posts where you are set Responsible Author"
 msgstr "Bei diesen Posts bist du als Verantwortlicher Autor eingetragen"
 
-#: responsible-author.php:170
+#: responsible-author.php:199
 msgid "No posts assigned to you."
 msgstr "Keine Posts vorhanden."
+
+#~ msgid ""
+#~ "Adds a dropdown in post editor to select a responsible user and saves it "
+#~ "in the 'responsible_author' custom field."
+#~ msgstr ""
+#~ "Fügt im Post Bearbeiten Dialog eine Dialogbox hinzu, wo der "
+#~ "verantwortliche Autor für diesen Post definiert werden kann."
