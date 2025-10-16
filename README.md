@@ -1,6 +1,6 @@
 # Wordpress Plugin Repsonsible Author
 
-This plugin adds a custom field to the post objects named `responsible_author`. The
+This plugin adds a meta field to the post objects named `_responsible_author`. The
 value is a list of user ids that are set as responsible for the post. The plugin allow
 to define whether a single user is responsible or many users can be selected as responsible.
 Also, the admin may define on which post types (e.g. pages only) the field should appear.
@@ -15,7 +15,7 @@ Also, the admin may define on which post types (e.g. pages only) the field shoul
 
 ## Usage
 
-Whenever you edit a post that is of the type where the meta field  should apperar, you
+Whenever you edit a post that is of the type where the meta field should appear, you
 see in the right column a box "Responsible Author" where you can select one or many users. After
 managing the selection the post must be updated to save the meta data field.
 
@@ -23,6 +23,8 @@ managing the selection the post must be updated to save the meta data field.
 
 ### 1.1
 
+* Use checkboxes to select post types in admin.
+* Use public post types only and display their names instead of the internal key.
 * Hide post meta key from being viewed directly when editing a post.
 * Add upgrade routine with version compare.
 
