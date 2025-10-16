@@ -65,7 +65,7 @@ class ResponsibleAuthor {
             $types = array_filter(array_map('trim', explode(',', $_POST[self::OPTION_POST_TYPES])));
             update_option(self::OPTION_POST_TYPES, $types);
             update_option(self::OPTION_MORE_THAN_ONE, $_POST[self::OPTION_MORE_THAN_ONE] === '1' ? 1 : 0);
-            echo '<div class="updated"><p>' . __('Settings saved') . '</p></div>';
+            echo '<div class="updated"><p>' . __('Changes saved') . '</p></div>';
         }
         $types = get_option(self::OPTION_POST_TYPES, []);
         $more_than_one = (int)get_option(self::OPTION_MORE_THAN_ONE, 0);
