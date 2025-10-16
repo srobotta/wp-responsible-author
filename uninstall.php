@@ -15,11 +15,12 @@ if (! defined( 'WP_UNINSTALL_PLUGIN' )) {
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'responsible-author.php';
 
 // Remove options introduced by the plugin.
-delete_option(Responsible_Author::OPTION_POST_TYPES);
-delete_option(Responsible_Author::OPTION_MORE_THAN_ONE);
+delete_option(ResponsibleAuthor::OPTION_POST_TYPES);
+delete_option(ResponsibleAuthor::OPTION_MORE_THAN_ONE);
+delete_option(ResponsibleAuthor::OPTION_PLUGIN_VERSION);
 
 // Remove any transients and similar which the plugin may have left behind.
-$metakey= Responsible_Author::POST_META_KEY;
+$metakey= ResponsibleAuthor::POST_META_KEY;
 $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE `meta_key` = '{$metakey}'");
 
 // Remove this directory.

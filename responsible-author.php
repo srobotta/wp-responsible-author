@@ -2,26 +2,28 @@
 /*
 Plugin Name: Responsible Author
 Plugin URI:  https://github.com/srobotta/wp-responsible-author
-Description: Adds a dropdown in post editor to select a responsible user and saves it in the 'responsible_author' custom field.
+Description: Adds a dropdown when a post is edited to select one or more responsible users for that post/article. Can be used on certain post types only.
 Version:     1.1
 Author:      Stephan Robotta <stephan.robotta@bfh.ch>
 Text Domain: responsible-author
 License:     GPLv3
 Package:     Responible Author
+Keywords:    responsible author, author, editor, post, article, post type
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-class Responsible_Author {
+class ResponsibleAuthor {
 
     public const VERSION = '1.1';
 
     public const SLUG = 'responsible-author';
 
+    public const OPTION_PLUGIN_VERSION = 'responsible_author_plugin_version';
     public const OPTION_POST_TYPES = 'responsible_author_post_types';
     public const OPTION_MORE_THAN_ONE = 'responsible_author_more_than_one';
 
-    public const POST_META_KEY = 'responsible_author';
+    public const POST_META_KEY = '_responsible_author';
 
     public function init() {
         add_action('plugins_loaded', [$this, 'load_textdomain']);
@@ -31,6 +33,7 @@ class Responsible_Author {
         add_action('save_post', [$this, 'save_metabox']);
         add_action('show_user_profile', [$this, 'profile_section']);
         add_action('edit_user_profile', [$this, 'profile_section']);
+        add_action('admin_init', [$this, 'maybe_upgrade']);
     }
     
     // Load translations
@@ -220,6 +223,17 @@ class Responsible_Author {
         </table>
         <?php
     }
+
+    /**
+     * Maybe perform an upgrade if the installed version is older than the current version.
+     */
+    public function maybe_upgrade() {
+        $installed_version = get_option(self::OPTION_PLUGIN_VERSION, '0.0.0');
+        if (version_compare($installed_version, self::VERSION, '<')) {
+            require_once __DIR__ . DIRECTORY_SEPARATOR . 'upgrade.php';
+            responsible_author_upgrade($installed_version);
+        }
+    }
 }
 
-(new Responsible_Author())->init();
+(new ResponsibleAuthor())->init();
