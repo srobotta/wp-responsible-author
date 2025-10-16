@@ -15,6 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class ResponsibleAuthor {
 
+    private static $post_types_installed = null;
+
     public const VERSION = '1.1';
 
     public const SLUG = 'responsible-author';
@@ -58,17 +60,18 @@ class ResponsibleAuthor {
 
     // Render settings page
     public function render_settings_page() {
-        if (isset($_POST[self::OPTION_POST_TYPES]) &&
-            isset($_POST[self::OPTION_MORE_THAN_ONE]) &&
-            check_admin_referer('responsible_author_settings_save')
-        ) {
-            $types = array_filter(array_map('trim', explode(',', $_POST[self::OPTION_POST_TYPES])));
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && check_admin_referer('responsible_author_settings_save')) {
+            $types = isset($_POST[self::OPTION_POST_TYPES]) && is_array($_POST[self::OPTION_POST_TYPES])
+                ? array_keys(array_filter($_POST[self::OPTION_POST_TYPES], function($v) { return $v === '1'; }))
+                : [];
+            $more_than_one = isset($_POST[self::OPTION_MORE_THAN_ONE]) && $_POST[self::OPTION_MORE_THAN_ONE] === '1' ? 1 : 0;
             update_option(self::OPTION_POST_TYPES, $types);
-            update_option(self::OPTION_MORE_THAN_ONE, $_POST[self::OPTION_MORE_THAN_ONE] === '1' ? 1 : 0);
+            update_option(self::OPTION_MORE_THAN_ONE, $more_than_one);
             echo '<div class="updated"><p>' . __('Changes saved') . '</p></div>';
+        } else {
+            $types = get_option(self::OPTION_POST_TYPES, []);
+            $more_than_one = (int)get_option(self::OPTION_MORE_THAN_ONE, 0);
         }
-        $types = get_option(self::OPTION_POST_TYPES, []);
-        $more_than_one = (int)get_option(self::OPTION_MORE_THAN_ONE, 0);
         ?>
         <div class="wrap">
             <h1><?php esc_html_e('Responsible Author Settings', self::SLUG); ?></h1>
@@ -81,14 +84,34 @@ class ResponsibleAuthor {
                         <option value="1" <?php selected(1, $more_than_one); ?>><?php esc_html_e('Yes'); ?></option>
                     </select>
                 </p>
-                <p><?php esc_html_e('Enter a comma-separated list of post types where the Responsible Author dropdown should appear:', self::SLUG); ?></p>
-                <input type="text" name="<?php echo esc_attr(self::OPTION_POST_TYPES); ?>" value="<?php echo esc_attr(implode(',', $types)); ?>" style="width:400px;" />
+                <p><?php esc_html_e('Check all post types where the responsible author(s) can be set:', self::SLUG); ?></p>
+                <?php foreach ($this->get_installed_posttypes() as $key => $label) {
+                    $id = 'ra_pt_' . $key;
+                    $checked = checked(in_array($key, $types), true, false);
+                    printf(
+                        '<div><input type="checkbox" id="%1$s" name="%2$s[%3$s]" value="1"%4$s /><label for="%1$s">%5$s</label></div>',
+                        $id, self::OPTION_POST_TYPES, esc_attr($key), $checked, esc_html($label)
+                    );
+                } ?>
                 <p><input type="submit" class="button-primary" value="<?php echo esc_attr(__('Save Changes')); ?>" /></p>
-                <p><?php esc_html_e('Possible post types are:', self::SLUG); ?></p>
-                <p style="font-family: monospace;"><?php echo esc_html(implode(', ', get_post_types())) ?></p>
             </form>
         </div>
         <?php
+    }
+
+    /**
+     * Get all installed post types with their labels.
+     * @return array An associative array where keys are post type names and values are their labels
+     */
+    public function get_installed_posttypes(): array {
+        if (self::$post_types_installed === null) {
+            self::$post_types_installed = [];
+            foreach (get_post_types(['public' => true]) as $post_type) {
+                $obj = get_post_type_object($post_type);
+                self::$post_types_installed[$post_type] = $obj && isset($obj->labels->name) ? $obj->labels->name : $post_type;
+            }
+        }
+        return self::$post_types_installed;
     }
 
     // Add settings link on Plugins page
