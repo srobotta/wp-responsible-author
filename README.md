@@ -18,3 +18,14 @@ Also, the admin may define on which post types (e.g. pages only) the field shoul
 Whenever you edit a post that is of the type where the meta field  should apperar, you
 see in the right column a box "Responsible Author" where you can select one or many users. After
 managing the selection the post must be updated to save the meta data field.
+
+## History
+
+### 1.1
+
+* Hide post meta key from being viewed directly when editing a post.
+* Add upgrade routine with version compare.
+
+### 1.0
+
+Initial Release
