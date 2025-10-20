@@ -67,7 +67,7 @@ class ResponsibleAuthor {
             $more_than_one = isset($_POST[self::OPTION_MORE_THAN_ONE]) && $_POST[self::OPTION_MORE_THAN_ONE] === '1' ? 1 : 0;
             update_option(self::OPTION_POST_TYPES, $types);
             update_option(self::OPTION_MORE_THAN_ONE, $more_than_one);
-            echo '<div class="updated"><p>' . __('Changes saved') . '</p></div>';
+            echo '<div class="updated"><p>' . __('Settings saved.') . '</p></div>';
         } else {
             $types = get_option(self::OPTION_POST_TYPES, []);
             $more_than_one = (int)get_option(self::OPTION_MORE_THAN_ONE, 0);
